@@ -7,12 +7,21 @@ import java.util.List;
  * Created by Andry on 11.06.2017.
  */
 
+//создаем клас напиток который будет отвечать за состав меню напитков
 public class Drink {
 
+    //создаем переменную имени напитка описания и id картинки напитка
     private String name;
     private String description;
     private int imageID;
 
+    //создаем конструктор с полями
+    public Drink(String name, String description, int imageID) {
+        this.name = name;
+        this.description = description;
+        this.imageID = imageID;
+    }
+    //создаем массив напитков который заполянем именем ,описанием и ссылкой на картинку для данного напитка
     public static final Drink[] drinks={
             new Drink("Еспрессо","Гарна кава. але її чомусь дуже мало в наше время в цьому горнятку",R.drawable.espresso),
             new Drink("Амерікано","В принципі добра кава, налито в ній на 50 мл більше ніж в еспрессо",R.drawable.americano),
@@ -26,15 +35,7 @@ public class Drink {
             new Drink("Чорничний чай","В принципі не погана альтернатива компоту",R.drawable.raspberrytea)
     };
 
-
-
-
-    public Drink(String name, String description, int imageID) {
-        this.name = name;
-        this.description = description;
-        this.imageID = imageID;
-    }
-
+    //Создаем гетеры на данную продукцию
     public String getName() {
         return name;
     }
@@ -47,7 +48,7 @@ public class Drink {
         return imageID;
     }
 
-
+    //создаем toString для описания наших продуктов в активносости
     @Override
     public String toString() {
         return this.name;

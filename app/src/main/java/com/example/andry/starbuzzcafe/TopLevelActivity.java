@@ -16,17 +16,21 @@ public class TopLevelActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_top_level);
-
+        //создаем адаптер и метод выбора позиции из списка
         AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position==0){
+                    //создаем интен смены активности при выбори заданой позиции из списка
                     Intent intent = new Intent(TopLevelActivity.this,DrinkCategoryActivity.class);
+                    //указываем какой интет будет стартовать при нажатии на позицию из списка
                     startActivity(intent);
                 }
             }
         };
+        //создаем список который связан с ресурсным массивм переменных по id
         ListView listView = (ListView)findViewById(R.id.list_options);
+        //указываем что будет происходить при выборе данного элемента из списка
         listView.setOnItemClickListener(itemClickListener);
 
 
