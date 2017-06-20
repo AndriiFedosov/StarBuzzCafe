@@ -20,5 +20,21 @@
         android:entries="@array/options"
         />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/favorites"
+        android:layout_marginLeft="10dp"
+        />
+
+    <ListView
+        android:layout_marginLeft="20dp"
+        android:id="@+id/list_favorite"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
 
 </LinearLayout>

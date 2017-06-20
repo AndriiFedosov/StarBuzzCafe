@@ -1,11 +1,19 @@
 package com.example.andry.starbuzzcafe;
 
 import android.app.Activity;
-import android.media.Image;
+import android.content.ContentValues;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteOpenHelper;
 
 /**
  * Created by Andry on 11.06.2017.
@@ -25,28 +33,84 @@ public class DrinkActivity extends Activity{
         //в переменную номера напитка принимаем данные из другой активности по ключу
         int drinkNo = (Integer)getIntent().getExtras().get(EXTRA_DRINKNO);
 
-        //указываем какой именно напиток из массива будет показанж
-        Drink thisdrink = Drink.drinks[drinkNo];
+        try {
+            SQLiteOpenHelper starbuzzDatabase = new StarbuzzDatabaseHelper(this);
+            SQLiteDatabase db = starbuzzDatabase.getWritableDatabase();
+            Cursor cursor = db.query("DRINK",
+                            new String[]{"NAME","DESCRIPTION","IMAGE_RESOURCE_ID", "FAVORITE"},
+                            "_id=?",new String[]{Integer.toString(drinkNo)},
+                            null,null,null);
+            if(cursor.moveToFirst()){
+                String nameText = cursor.getString(0);
+                String descriptionText = cursor.getString(1);
+                int photoId = cursor.getInt(2);
+                boolean isFavorite = (cursor.getInt(3)==1);
 
-        //создаем макет изображения и находим его по id
-        ImageView imageView = (ImageView) findViewById(R.id.photo);
-        //указываем что ресурсом изображения будет ссылка на изображение выбраного напитка
-        imageView.setImageResource(thisdrink.getImageID());
-        //указываем что ресурсом описания будет имя выбраного напитка
-        imageView.setContentDescription(thisdrink.getName());
+                //создаем текстовое поле и находим его по id
+                TextView name = (TextView)findViewById(R.id.name);
+                name.setText(nameText);
 
-        //создаем текстовое поле и находим его по id
-        TextView name = (TextView)findViewById(R.id.name);
-        //указываем что ресурсом имени будет ссылка на имя выбраного напитка
-        name.setText(thisdrink.getName());
-
-        //создаем текстовое поле и находим его по id
-        TextView description = (TextView)findViewById(R.id.description);
-        //указываем что ресурсом описания будет ссылка на описание выбраного напитка
-        description.setText(thisdrink.getDescription());
+                ImageView imageView = (ImageView) findViewById(R.id.photo);
+                //указываем что ресурсом изображения будет ссылка на изображение выбраного напитка
+                imageView.setImageResource(photoId);
+                //указываем что ресурсом описания будет имя выбраного напитка
+                imageView.setContentDescription(nameText);
 
 
+                //создаем текстовое поле и находим его по id
+                TextView description = (TextView)findViewById(R.id.description);
+                //указываем что ресурсом описания будет ссылка на описание выбраного напитка
+                description.setText(descriptionText);
 
+                CheckBox favorite = (CheckBox)findViewById(R.id.favorite);
+                favorite.setChecked(isFavorite);
+            }
+            cursor.close();
+            db.close();
+        }
+        catch (SQLiteException e){
 
+        }
+    }
+
+    public void onFavoriteClicked(View view) {
+        int drinkNo = (Integer) getIntent().getExtras().get("drinkNo");
+        new UpdateDrinkTask().execute(drinkNo);
+
+    }
+    private class UpdateDrinkTask extends AsyncTask<Integer,Void,Boolean>{
+            ContentValues drinkValues;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            CheckBox favorite = (CheckBox)findViewById(R.id.favorite);
+            ContentValues drinkValues = new ContentValues();
+            drinkValues.put("FAVORITE",favorite.isChecked());
+        }
+
+        @Override
+        protected Boolean doInBackground(Integer... drinks) {
+            int drinkNo = drinks[0];
+            SQLiteOpenHelper sturbuzzDatbase = new StarbuzzDatabaseHelper(DrinkActivity.this);
+            try {
+                SQLiteDatabase db = sturbuzzDatbase.getWritableDatabase();
+                db.update("DRINK", drinkValues,
+                        "_id = ?", new String[]{Integer.toString(drinkNo)});
+                db.close();
+                return true;
+            } catch (SQLiteException e){
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean empty) {
+           if(!empty){
+               Toast toast = Toast.makeText(DrinkActivity.this,"Database is unvariable",Toast.LENGTH_SHORT);
+               toast.show();
+           }
+
+        }
     }
 }
